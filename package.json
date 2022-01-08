@@ -1,0 +1,29 @@
+{
+  "name": "gqltutorial",
+  "version": "1.0.0",
+  "description": "An educational project to learn graphQL",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/puentebravo/graphQLTutorial.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/puentebravo/graphQLTutorial/issues"
+  },
+  "homepage": "https://github.com/puentebravo/graphQLTutorial#readme",
+  "devDependencies": {
+    "ts-node-dev": "^1.1.8",
+    "typescript": "^4.5.4"
+  },
+  "dependencies": {
+    "apollo-server": "^3.6.1",
+    "graphql": "^15.8.0",
+    "nexus": "^1.1.0"
+  }
+}
