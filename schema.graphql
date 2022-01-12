@@ -9,9 +9,11 @@ type Link {
 }
 
 type Mutation {
+  delete(id: Int!): Link!
   post(description: String!, url: String!): Link!
 }
 
 type Query {
   feed: [Link!]!
+  oneLink(id: Int!): Link!
 }
