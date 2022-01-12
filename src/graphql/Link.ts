@@ -1,4 +1,4 @@
-import { objectType, extendType, nonNull, stringArg, arg } from "nexus";
+import { objectType, extendType, nonNull, stringArg, arg, intArg } from "nexus";
 import { NexusGenObjects } from "../../nexus-typegen";
 
 export const Link = objectType({
@@ -24,6 +24,16 @@ let links: NexusGenObjects["Link"][] = [
     url: "graphql.org",
     description: "GraphQL official website",
   },
+  {
+    id: 3,
+    url: "www.google.com",
+    description: "The search engine that is also a verb."
+  },
+  {
+    id: 4,
+    url: "www.ask.com",
+    description: "In years of yore, a search engine with a genteel face."
+  }
 ];
 // extending the Query root type/factory type, adding a new root field to it called feed.
 export const LinkQuery = extendType({
@@ -40,30 +50,75 @@ export const LinkQuery = extendType({
   },
 });
 
-
-// Extends the mutation type to add a new root field, linkmutation. 
+// Extends the mutation type to add a new root field, linkmutation.
 export const LinkMutation = extendType({
   type: "Mutation",
   definition(t) {
-    t.nonNull.field("post", { // names the mutation post, and returns a link object that is non nullable. 
+    t.nonNull.field("post", {
+      // names the mutation post, and returns a link object that is non nullable.
       type: "Link",
-      args: {  // Defines arguments passed to the graphql api endpoints. This is done similarly to REST api (why fix what isn't broken). 
+      args: {
+        // Defines arguments passed to the graphql api endpoints. This is done similarly to REST api (why fix what isn't broken).
         description: nonNull(stringArg()),
         url: nonNull(stringArg()),
       },
 
       resolve(parent, args, context) {
+        // Carries the arguments for the operation defined above; in this case, that's the URL and description of the link to be created. Think of these three as similar to req, res for REST endpoints.
         const { description, url } = args;
 
-        let idCount = links.length + 1;
+        let idCount = links.length + 1; // this serves as a very basic way of generating ids for link objects, adding one to the length of the links array.
         const link = {
           id: idCount,
-          description: args.description,
-          url: args.url,
+          description: description,
+          url: url,
         };
         links.push(link);
-        return link;
+        return link; // if anything but link is returned here, the generated types and TS will catch the mistake.
       },
     });
   },
 });
+
+export const OneLinkQuery = extendType({
+  type: "Query",
+  definition(t) {
+    t.nonNull.field("oneLink", {
+      type: "Link",
+      args: {
+        id: nonNull(intArg())
+      },
+
+      resolve(parent, args, context) {
+        const index = args.id - 1
+
+        return links[index]
+      }
+    })
+  }
+})
+
+export const DeleteLinkMutation = extendType({
+  type: "Mutation",
+  definition(t) {
+    t.nonNull.field("delete", {
+      type: "Link",
+      args: {
+        id: nonNull(intArg())
+      }, 
+
+      resolve(parent, args, context) {
+        const index = args.id
+
+        for (let i = 0; i < links.length; i++) {
+          if (links[i].id === index) {
+            links.splice(i, 1)
+          }
+        }
+
+        return links[index]
+        
+      }
+    })
+  }
+})
