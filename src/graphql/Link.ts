@@ -12,6 +12,13 @@ export const Link = objectType({
   },
 });
 
+export const Message = objectType({
+  name: "Message",
+  definition(t) {
+    t.nonNull.string("title"), t.nonNull.string("body");
+  },
+});
+
 // defines the type of the links variable as an array of Link objects, such as those listed below.
 let links: NexusGenObjects["Link"][] = [
   {
@@ -27,13 +34,13 @@ let links: NexusGenObjects["Link"][] = [
   {
     id: 3,
     url: "www.google.com",
-    description: "The search engine that is also a verb."
+    description: "The search engine that is also a verb.",
   },
   {
     id: 4,
     url: "www.ask.com",
-    description: "In years of yore, a search engine with a genteel face."
-  }
+    description: "In years of yore, a search engine with a genteel face.",
+  },
 ];
 // extending the Query root type/factory type, adding a new root field to it called feed.
 export const LinkQuery = extendType({
@@ -86,17 +93,17 @@ export const OneLinkQuery = extendType({
     t.nonNull.field("oneLink", {
       type: "Link",
       args: {
-        id: nonNull(intArg())
+        id: nonNull(intArg()),
       },
 
       resolve(parent, args, context) {
-        const index = args.id - 1
+        const index = args.id - 1;
 
-        return links[index]
-      }
-    })
-  }
-})
+        return links[index];
+      },
+    });
+  },
+});
 
 export const DeleteLinkMutation = extendType({
   type: "Mutation",
@@ -104,20 +111,42 @@ export const DeleteLinkMutation = extendType({
     t.nonNull.field("delete", {
       type: "Link",
       args: {
-        id: nonNull(intArg())
-      }, 
+        id: nonNull(intArg()),
+      },
 
       resolve(parent, args, context) {
-        const index = args.id
+        const index = args.id;
 
         for (let i = 0; i < links.length; i++) {
           if (links[i].id === index) {
-            links.splice(i, 1)
+            links.splice(i, 1);
           }
         }
 
-        return links[index]
-        
+        return links[index];
+      },
+    });
+  },
+});
+
+
+export const MessageQuery = extendType({
+  type: "Query",
+  definition(t) {
+    t.field("sampleMessage", {
+      type: "Message",
+      args: {
+        title: nonNull(stringArg()),
+        body: nonNull(stringArg())
+      },
+
+      resolve(parent, args, context) {
+        const sample = {
+          title: args.title,
+          body: args.body
+        }
+
+        return sample
       }
     })
   }
