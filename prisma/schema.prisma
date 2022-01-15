@@ -1,0 +1,28 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Link {
+  id          Int      @id @default(autoincrement()) // @id attribute here indicates that this is the primary key for this table. The @default attribute signifies that this field should be automatically generated if no value is given when a Link record is inserted.
+  createdAt   DateTime @default(now()) // @default here is the same as above: if there isn't a value for createdAt given when a record is created, then the current time is used as default. 
+  description String // nothing to see here. Defines both of these rows as strings. 
+  url         String
+  postedBy       User?    @relation(fields: [postedByID], references: [id]) //forges a many to one relationship with the user table, linking this to the links list below. 
+  postedByID      Int?
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  name     String
+  email    String @unique
+  password String
+  links    Link[]
+}
