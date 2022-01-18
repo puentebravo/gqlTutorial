@@ -1,5 +1,4 @@
 import { objectType, extendType, nonNull, stringArg, arg, intArg } from "nexus";
-import { NexusGenObjects } from "../../nexus-typegen";
 
 export const Link = objectType({
   // defines the name of the type you're building.
@@ -9,9 +8,16 @@ export const Link = objectType({
     t.nonNull.int("id"); // adds non nullable id as an integer, and a description and url as strings.
     t.nonNull.string("description");
     t.nonNull.string("url");
+    t.field("postedBy", {
+      type: "User",
+      resolve(parent, args, context) { // similar to the User property, this lists the user who created this post, if any.
+        return context.prisma.link
+          .findUnique({ where: { id: parent.id } })
+          .postedBy();
+      },
+    });
   },
 });
-
 
 // extending the Query root type/factory type, adding a new root field to it called feed.
 export const LinkQuery = extendType({
@@ -55,4 +61,3 @@ export const LinkMutation = extendType({
     });
   },
 });
-
