@@ -10,7 +10,8 @@ export const Link = objectType({
     t.nonNull.string("url");
     t.field("postedBy", {
       type: "User",
-      resolve(parent, args, context) { // similar to the User property, this lists the user who created this post, if any.
+      resolve(parent, args, context) {
+        // similar to the User property, this lists the user who created this post, if any.
         return context.prisma.link
           .findUnique({ where: { id: parent.id } })
           .postedBy();
@@ -49,10 +50,18 @@ export const LinkMutation = extendType({
 
       resolve(parent, args, context) {
         // Carries the arguments for the operation defined above; in this case, that's the URL and description of the link to be created. Think of these four as similar to req, res for REST endpoints. The parent carries the result of the previous resolver execution level.
+        const { description, url } = args;
+        const { userId } = context;
+
+        if (!userId) { //checks for the presence of a userID. If there's none, throw an error. 
+          throw new Error("You need to be logged in for this.");
+        }
+
         const newLink = context.prisma.link.create({
-          data: {
-            description: args.description,
-            url: args.url,
+          data: { // associates the link with the currently logged in user. 
+            description,
+            url,
+            postedBy: { connect: { id: userId } },
           },
         });
 
