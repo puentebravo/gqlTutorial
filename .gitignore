@@ -102,3 +102,7 @@ dist
 
 # TernJS port file
 .tern-port
+
+# ignored files. Somehow, gitignore is not ignored. 
+
+src/utils/auth.ts
