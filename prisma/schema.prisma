@@ -11,7 +11,7 @@ datasource db {
 }
 
 model Link {
-  id          Int      @id @default(autoincrement()) // @id attribute here indicates that this is the primary key for this table. The @default attribute signifies that this field should be automatically generated if no value is given when a Link record is inserted.
+  id          Int      @id @default(autoincrement()) // @id attribute here indicates that this is the primary key for this table. The @default attribute signifies that this field should be automatically generated if no value is given when a Link record is inserted. 
   createdAt   DateTime @default(now()) // @default here is the same as above: if there isn't a value for createdAt given when a record is created, then the current time is used as default. 
   description String // nothing to see here. Defines both of these rows as strings. 
   url         String
@@ -24,5 +24,5 @@ model User {
   name     String
   email    String @unique
   password String
-  links    Link[]
+  links    Link[] //expresses a one to many relationship with links posted by this userID. 
 }
