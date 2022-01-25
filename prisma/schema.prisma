@@ -15,8 +15,9 @@ model Link {
   createdAt   DateTime @default(now()) // @default here is the same as above: if there isn't a value for createdAt given when a record is created, then the current time is used as default. 
   description String // nothing to see here. Defines both of these rows as strings. 
   url         String
-  postedBy       User?    @relation(fields: [postedByID], references: [id]) //forges a many to one relationship with the user table, linking this to the links list below. 
-  postedByID      Int?
+  postedBy    User?    @relation(name: "PostedBy", fields: [postedByID], references: [id]) //forges a many to one relationship with the user table, linking this to the links list below. 
+  postedByID  Int?
+  voters      User[]   @relation(name: "Votes") // Adds a new voters relation field which is connected to multiple User records. Each User, in turn, owns multiple links. This is another many to many link. This would usually require a join, but since we're using prisma, 
 }
 
 model User {
@@ -24,5 +25,6 @@ model User {
   name     String
   email    String @unique
   password String
-  links    Link[] //expresses a one to many relationship with links posted by this userID. 
+  links    Link[] @relation(name: "PostedBy") //expresses a one to many relationship with links posted by this userID. 
+  votes    Link[] @relation(name: "Votes")
 }
