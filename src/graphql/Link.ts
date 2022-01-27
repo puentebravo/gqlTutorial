@@ -8,6 +8,7 @@ export const Link = objectType({
     t.nonNull.int("id"); // adds non nullable id as an integer, and a description and url as strings.
     t.nonNull.string("description");
     t.nonNull.string("url");
+    t.nonNull.dateTime("createdAt");
     t.field("postedBy", {
       type: "User",
       resolve(parent, args, context) {
@@ -15,6 +16,15 @@ export const Link = objectType({
         return context.prisma.link
           .findUnique({ where: { id: parent.id } })
           .postedBy();
+      },
+    });
+    t.nonNull.list.nonNull.field("voters", {
+      // Similar to the above, this returns a list of unique voters by getting the user ID from the parent, finding the User, and then invoking voters recursively until it doesn't find a result.
+      type: "User",
+      resolve(parent, args, context) {
+        return context.prisma.link
+          .findUnique({ where: { id: parent.id } })
+          .voters();
       },
     });
   },
@@ -27,9 +37,22 @@ export const LinkQuery = extendType({
     t.nonNull.list.nonNull.field("feed", {
       //defines the return type of the feed query as a non nullable array of link type objects. In schema definition language (sdl), it'll look look like [Link!]!
       type: "Link",
+      args: {
+        filter: stringArg(),  // The filter argument is optional. If you don't want to filter results, you can skip this. 
+      },
       resolve(parent, args, context, info) {
+        const where = args.filter // In case you do end up using filter, this constructs a where object that expresses the filter condition. In this case, the filter condition is that the decription or the url (or both) should have some kind of substring that matches whatever's in the filter. 
+        ? {
+          OR: [
+            {description: {contains: args.filter}},
+            {url: {contains: args.filter}}
+          ]
+        }
+        : {}
         // this is the name of the resolver function of the feed query. A resolver is the implementation for a GraphQL field. Each field on every type (including root types) has a resolver which executes to get the return value when fetching that type. Essentially, this is the business end of a GraphQL type - it gets you the info you need in the format you specified. This one returns the links array.
-        return context.prisma.link.findMany();
+        return context.prisma.link.findMany({
+          where,
+        });
       },
     });
   },
@@ -53,12 +76,14 @@ export const LinkMutation = extendType({
         const { description, url } = args;
         const { userId } = context;
 
-        if (!userId) { //checks for the presence of a userID. If there's none, throw an error. 
+        if (!userId) {
+          //checks for the presence of a userID. If there's none, throw an error.
           throw new Error("You need to be logged in for this.");
         }
 
         const newLink = context.prisma.link.create({
-          data: { // associates the link with the currently logged in user. 
+          data: {
+            // associates the link with the currently logged in user.
             description,
             url,
             postedBy: { connect: { id: userId } },
