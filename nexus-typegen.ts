@@ -111,7 +111,7 @@ export interface NexusGenFieldTypes {
     vote: NexusGenRootTypes['Vote'] | null; // Vote
   }
   Query: { // field return type
-    feed: NexusGenRootTypes['Feed'][]; // [Feed!]!
+    feed: NexusGenRootTypes['Feed']; // Feed!
   }
   User: { // field return type
     email: string; // String!
