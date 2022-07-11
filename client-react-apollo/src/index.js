@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import ReactDOM from 'react-dom';
 import './styles/index.css';
 import App from './components/App';
 
@@ -14,7 +14,7 @@ import {
 
 // declare uri for apollo/graphql server
 const httpLink = createHttpLink({
-  uri: "http:/localhost:4000"
+  uri: "http://localhost:4000"
 });  
 
 // instantiate a new Apollo client, passing in the uri above and creating a new memory cache.
